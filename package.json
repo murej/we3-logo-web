@@ -1,0 +1,25 @@
+{
+  "name": "we3-logo-web",
+  "version": "1.0.0",
+  "description": "We3 logo experiment for the web",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/murej/we3-logo-web.git"
+  },
+  "keywords": [
+    "we3",
+    "logo",
+    "web",
+    "experiment"
+  ],
+  "author": "Jure Martinec",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/murej/we3-logo-web/issues"
+  },
+  "homepage": "https://github.com/murej/we3-logo-web#readme"
+}
