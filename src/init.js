@@ -1,5 +1,5 @@
 import paper from 'paper/dist/paper-full'
-import we3LogoSvg from '/src/we3_logo.svg';
+import we3LogoSvg from './we3_logo.svg';
 import { getRandomNumber, mapValue, easeOutElastic, getSignMultiplier } from './helpers';
 
 let initialLogoItemPositions = [];
