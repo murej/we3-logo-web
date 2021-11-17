@@ -15,3 +15,11 @@ export function easeOutElastic(x) {
             ? 1
             : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
 }
+
+export function getSignMultiplier() {
+    if (Math.random() < 0.5) {
+      return -1;
+    } else {
+      return 1;
+    }
+  }
