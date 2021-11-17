@@ -25,7 +25,7 @@ function onFrame(event) {
     // })
 
     // circlePaths.forEach((path, i) => {
-    //     // path.rotation += 1 * (i + 1) / 128;
+    //     path.rotation += 1 * (i + 1) / 256;
     // });
 }
 
@@ -33,11 +33,11 @@ function createPaths() {
     const { width, height } = paper.view.size;
 
     var values = {
-        paths: 6,
-        minPoints: 8,
-        maxPoints: Math.random() * 32,
-        minRadius: (width > height ? width : height) / 8,
-        maxRadius: (width > height ? width : height) / 1.5,
+        paths: getRandomNumber(4,16),
+        minPoints: getRandomNumber(3,8),
+        maxPoints: getRandomNumber(8, 32),
+        minRadius: (width > height ? width : height) / 3,
+        maxRadius: (width < height ? width : height) / 1.5,
         baseHue: Math.random() * 360,
         strokeWidth: 32
     };
@@ -51,7 +51,8 @@ function createPaths() {
         var lightness = (Math.random() - 0.5) * 0.4 + 0.4;
         var hue = values.baseHue + (i * 360 / values.paths) % 360;
         path.fillColor = { hue: hue, saturation: 1, lightness: lightness };
-        // path.strokeWidth = 2;
+        // path.strokeWidth = 4;
+        // path.strokeColor = 'white'
         // path.strokeColor = { hue: hue, saturation: 1, lightness: lightness };
         path.sendToBack();
         // path.strokeWidth = values.strokeWidth;
@@ -64,13 +65,13 @@ function createBlob(center, maxRadius, points) {
     path.closed = true;
     for (var i = 0; i < points; i++) {
         var delta = new paper.Point({
-            length: (maxRadius * 0.5) + (Math.random() * maxRadius * 0.5),
+            length: (maxRadius * 0.66) + (Math.random() * maxRadius * 0.34),
             angle: (360 / points) * i
         });
         path.add({ x: center.x + delta.x, y: center.y + delta.y });
     }
-    // path.smooth({ type: 'continuous' });
-    // path.simplify();
+    (Math.random() <= 0.5 ? true : false) && path.smooth({ type: 'continuous' });
+    // (Math.random() <= 0.5 ? true : false) && path.simplify();
     return path;
 }
 
@@ -95,26 +96,34 @@ function createBackground() {
 }
 
 function onSVGLoad(loadedSvgItem) {
-    
+
     let logoGroup = loadedSvgItem;
     logoGroup.children[0].remove();
     // logoGroup.clipped = false:
 
+    logoGroup.fillColor = null;
     // logoGroup.fillColor = new paper.Color(1,1,1)//{ hue: 15, saturation: 1, lightness: 1 };
     // logoGroup.fillColor = new paper.Color(1,1,1);
     // logoGroup.opacity = 0;
-    logoGroup.strokeColor = null;
+    logoGroup.strokeColor = 'white';
     logoGroup.strokeWidth = 4;
     logoGroup.position = paper.view.center;
+
+    // logoGroup.children[0].smooth({ type: 'continuous' });
+    // logoGroup.children[1].smooth({ type: 'continuous' });
+    // logoGroup.children[2].smooth({ type: 'continuous' });
+    // logoGroup.children[0].simplify();
+    // logoGroup.children[1].simplify();
+    // logoGroup.children[2].simplify();
 
     const staticLayer = new paper.Layer(logoGroup);
     // staticLayer.blendMode = 'multiply'
 
-    generateInitialLogoGroups(logoGroup, getRandomNumber(4,24));
+    generateInitialLogoGroups(logoGroup, getRandomNumber(16, 96));
 }
 
 function generateInitialLogoGroups(logoGroup, count) {
-    const gap = 8;
+    const gap = 2;
     const interactiveLayer = new paper.Layer();
     // interactiveLayer.blendMode = 'multiply'
 
@@ -139,18 +148,28 @@ function generateInitialLogoGroups(logoGroup, count) {
         // }
 
         // logoGroupInstance.fillColor = new paper.Color(fillVal.r, fillVal.g, fillVal.b);
-        logoGroupInstance.strokeColor = new paper.Color(1,1,1);
+        logoGroupInstance.fillColor = new paper.Color(1, 1, 1, ((i + 1) / count));
+        // logoGroupInstance.fillColor = new paper.Color(((i + 1) / count), ((i + 1) / count), ((i + 1) / count))
+
+        if (!isLastGroup) {
+            logoGroupInstance.strokeColor = null;
+            // logoGroupInstance.strokeColor = new paper.Color(((i + 1) / count), ((i + 1) / count), ((i + 1) / count))
+
+        }
+        // logoGroupInstance.strokeColor = new paper.Color(1,1,1);
         // logoGroupInstance.opacity = i / (count - 1);
 
         isLastGroup && logoGroupInstance.children.forEach((logoItem) => {
+            logoGroupInstance.fillColor = 'black';
             logoItem.onMouseEnter = handleOnLogoGroupMouseEnter;
+            logoItem.onMouseMove = handleOnLogoGroupMouseMove;
             logoItem.onMouseLeave = handleOnLogoGroupMouseLeave;
             logoItem.onMouseDrag = handleOnLogoGroupMouseDrag;
             logoItem.onMouseDown = handleOnLogoGroupMouseDown;
             logoItem.onMouseUp = handleOnLogoGroupMouseUp;
         })
 
-        logoGroupInstance.position.x += -i * gap * signMultiplier1;
+        logoGroupInstance.position.x += -i * gap * signMultiplier1 / gap;
         logoGroupInstance.position.y += -i * gap * signMultiplier2;
 
         initialLogoItemPositions.push({
@@ -191,13 +210,16 @@ function resetLogoGroup() {
 let hasFlicked = false;
 
 function handleOnLogoGroupMouseEnter(event) {
-    // if(!hasFlicked) {
-    //     moveLogoGroup({ x: 10, y: 5 });//{ x: getRandomNumber(-10,10), y: getRandomNumber(-10,10) });
-    //     setTimeout(resetLogoGroup, 75);
-    //     hasFlicked = true;
-    // }
     event.target.fillColor = 'white';
     document.getElementById('canvas').style.cursor = "pointer";
+}
+function handleOnLogoGroupMouseMove(event) {
+    if (!hasFlicked && event.delta !== null) {
+        moveLogoGroup({ x: event.delta.x, y: event.delta.y });
+        setTimeout(resetLogoGroup, 0);
+        hasFlicked = true;
+    }
+    // moveLogoGroup(event.delta)
 }
 
 function handleOnLogoGroupMouseLeave(event) {
@@ -214,10 +236,10 @@ function handleOnLogoGroupMouseDrag(event) {
     circlePaths.forEach((path, i) => {
         // path.selected = true;
         path.segments.forEach((segment, j) => {
-            segment.point.x -= Math.random() * event.delta.x / 2;
-            segment.point.y -= Math.random() * event.delta.y / 2;
+            segment.point.x -= Math.random() * event.delta.x * (i + 1) / 2;
+            segment.point.y -= Math.random() * event.delta.y * (i + 1) / 2;
         });
-        path.rotation += 1 * (i + 1) / 8;
+        path.rotation += 1 * (i + 1) / 8 * (i * event.delta.x / 16);
         // path.smooth({ type: 'continuous' });
         // path.simplify();
     });
@@ -239,10 +261,13 @@ export function init() {
     paper.project.importSVG(we3LogoSvg, onSVGLoad);
     createPaths();
     createBackground();
-    console.log(paper.project.layers);
     // paper.view.draw();
 
     paper.view.onFrame = onFrame;
+    // paper.view.onResize = function(event) {
+    //     paper.clear();
+    //     init();
+    // }
     // paper.view.onMouseMove = function(event) {
     //     const hasDelta = event.delta !== null;
     //     hasDelta && paper.project.layers[1].children.forEach((path, i) => {
