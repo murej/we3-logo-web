@@ -3,10 +3,14 @@
 
 ## Running
 
-```npm start```
+```
+npm start
+```
 
 ## Building
 
-```npm run build```
+```
+npm run build
+```
 
 Creates a `/public` folder that can be served as a static website.
